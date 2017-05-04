@@ -1,0 +1,157 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="container" style="margin-top: 5%">
+    <h1 class="text-center">Wszystkie korpusy</h1>
+    <table class="table table-hover" >
+        <thead>
+        <tr>
+            <th>Id</th>
+            <th>Autor</th>
+            <th>Nazwa</th>
+            <th>Liczba tematów</th>
+            <th>Data utworzenia</th>
+        </tr>
+        </thead>
+        <tbody style="cursor: pointer" data-link="row" class="rowlink">
+        <tr>
+            <td><a href="prez.html">1</a></td>
+            <td>Jan Kowalski</td>
+            <td>Powieści Sienkiewicza</td>
+            <td>30</td>
+            <td>20/04/2017</td>
+            <td>
+                <button class="rowlink-skip" data-toggle="modal" data-target="#details">Szczegóły</button>
+            </td>
+        </tr>
+        <tr>
+            <td><a href="prez.html">2</a></td>
+            <td>Jan Kowalski</td>
+            <td>Powieści Sienkiewicza</td>
+            <td>30</td>
+            <td>20/04/2017</td>
+            <td>
+                <button class="rowlink-skip" data-toggle="modal" data-target="#details">Szczegóły</button>
+            </td>
+        </tr>
+        <tr>
+            <td><a href="prez.html">3</a></td>
+            <td>Jan Kowalski</td>
+            <td>Powieści Sienkiewicza</td>
+            <td>30</td>
+            <td>20/04/2017</td>
+            <td>
+                <button class="rowlink-skip" data-toggle="modal" data-target="#details">Szczegóły</button>
+            </td>
+        </tr>
+        <tr>
+            <td><a href="prez.html">4</a></td>
+            <td>Jan Kowalski</td>
+            <td>Powieści Sienkiewicza</td>
+            <td>30</td>
+            <td>20/04/2017</td>
+            <td>
+                <button class="rowlink-skip" data-toggle="modal" data-target="#details">Szczegóły</button>
+            </td>
+        </tr>
+        <tr>
+            <td><a href="prez.html">5</a></td>
+            <td>Jan Kowalski</td>
+            <td>Powieści Sienkiewicza</td>
+            <td>30</td>
+            <td>20/04/2017</td>
+            <td>
+                <button class="rowlink-skip" data-toggle="modal" data-target="#details">Szczegóły</button>
+            </td>
+        </tr>
+        <tr>
+            <td><a href="prez.html">6</a></td>
+            <td>Jan Kowalski</td>
+            <td>Powieści Sienkiewicza</td>
+            <td>30</td>
+            <td>20/04/2017</td>
+            <td>
+                <button class="rowlink-skip" data-toggle="modal" data-target="#details">Szczegóły</button>
+            </td>
+        </tr>
+        <tr>
+            <td><a href="prez.html">7</a></td>
+            <td>Jan Kowalski</td>
+            <td>Powieści Sienkiewicza</td>
+            <td>30</td>
+            <td>20/04/2017</td>
+            <td>
+                <button class="rowlink-skip" data-toggle="modal" data-target="#details">Szczegóły</button>
+            </td>
+        </tr>
+        <tr>
+            <td><a href="prez.html">8</a></td>
+            <td>Jan Kowalski</td>
+            <td>Powieści Sienkiewicza</td>
+            <td>30</td>
+            <td>20/04/2017</td>
+            <td>
+                <button class="rowlink-skip" data-toggle="modal" data-target="#details">Szczegóły</button>
+            </td>
+        </tr>
+        <tr>
+            <td><a href="prez.html">9</a></td>
+            <td>Jan Kowalski</td>
+            <td>Powieści Sienkiewicza</td>
+            <td>30</td>
+            <td>20/04/2017</td>
+            <td>
+                <button class="rowlink-skip" data-toggle="modal" data-target="#details">Szczegóły</button>
+            </td>
+        </tr>
+        <tr>
+            <td><a href="prez.html">10</a></td>
+            <td>Jan Kowalski</td>
+            <td>Powieści Sienkiewicza</td>
+            <td>30</td>
+            <td>20/04/2017</td>
+            <td>
+                <button class="rowlink-skip" data-toggle="modal" data-target="#details">Szczegóły</button>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <!-- Modal -->
+    <div id="details" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Szczegóły korupusu</h4>
+                </div>
+                <div>
+                    <div class="col-lg-6">
+                        <h5>Id</h5>
+                        <h5>Autor</h5>
+                        <h5>Nazwa</h5>
+                        <h5>Lista tematów</h5>
+                        <h5>Data utworzenia</h5>
+                        <h5>Opis</h5>
+                    </div>
+                    <div class="col-lg-6">
+                        <h5>1</h5>
+                        <h5>Jan Kowalski</h5>
+                        <h5>Powieści Sienkiewicza</h5>
+                        <h5>30</h5>
+                        <h5>20/04/2017</h5>
+                        <h5>Korpus powstał na coś takmsdjhfalksjdfkas Sienkiewicza akjflkashlkasjdhflkasjhdlahdks notatki</h5>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default"><a href="prez.html"> Przejdź do korpusu</a></button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Zamknij</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}

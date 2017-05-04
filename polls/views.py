@@ -2,6 +2,9 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
 from .forms import DocumentForm
+from django.http import JsonResponse
+import zipfile
+import json
 from django.utils.encoding import smart_str
 from wsgiref.util import FileWrapper
 import mimetypes
@@ -14,20 +17,29 @@ import os
 def upload_content(request):
     if request.method == 'POST':
         form = DocumentForm(request.POST, request.FILES)
+        file = request.FILES['Plik_zip']
         if form.is_valid():
+            unzipping_file(file)
             form.save()
-            return HttpResponseRedirect('thanks/')
+            os.remove(os.path.join(settings.MEDIA_ROOT, 'documents/'+str(file)))
+            return HttpResponseRedirect('')
     else:
         form = DocumentForm()
-
-    return render(request,'main-page.html',{'form':form})
-
-def thanks(request):
-    return render(request, 'thanks.html')
+    return render(request, 'new.html', {'form':form})
 
 
+def new(request):
+    return render(request, 'new.html')
 
+def unzipping_file(name):
+    with zipfile.ZipFile(name, "r") as z:
+        z.extractall("media/documents")
 
+def index(request):
+    return render(request, 'index.html')
+
+def all(request):
+    return render(request, 'all.html')
 
 
 

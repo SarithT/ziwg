@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% load bootstrap3 %}
+
+{% block content %}
+{#  <form method="post" enctype="multipart/form-data">#}
+{#    <div class='col-sm-3 col-sm-offset-3'>#}
+{#        {% csrf_token %}#}
+{#        {% bootstrap_form form %}#}
+{##}
+{#        <button type="submit" class="btn btn-success">Upload</button>#}
+{#    </div>#}
+{#  </form>#}
+{#    <div class='col-sm-4 col-sm-offset-0'>#}
+{#        <p>Pobierz wzór excela</p>#}
+{#        <a href="/media/template.xlsx" download>#}
+{#            <button type="submit" class="btn btn-success">Download</button>#}
+{#        </a>#}
+{##}
+{#    </div>#}
+
+    <div class="container" style="margin-top: 5%">
+    <h1 class="text-center">Dodaj nowy korpus</h1>
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {% bootstrap_form form %}
+        <button type="submit" class="btn btn-success" data-toggle="modal" data-target="#sendEmailInfo">Generuj</button>
+{#        <div id="generateButton" type="button" class="btn btn-default" data-toggle="modal" data-target="#sendEmailInfo">Generuj</div>#}
+    </form>
+
+    <!-- Modal -->
+    <div id="sendEmailInfo" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Dane zostały wysłane! Kiedy proces generowania tematów się zakończy wyślemy wiadomość na Twóją pocztę. Swój korpus będziesz mógł znaleźć w bazie korpusów.</h4>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default"> <a href="index"> Przejdź do strony głównej</a></button>
+                    <button type="button" class="btn btn-default"> <a href="all"> Przejdź do baza korpusów</a></button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Zamknij</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+</div>
+
+
+
+{% endblock %}

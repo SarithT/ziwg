@@ -6,4 +6,4 @@ from polls.models import Document
 class DocumentForm(forms.ModelForm):
     class Meta:
         model = Document
-        fields = ('zip_file', 'xml_file','your_email' )
+        fields = ('Plik_zip', 'Plik_konfiguracyjny','Ilość_tematów','Email' )
