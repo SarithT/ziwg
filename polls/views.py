@@ -14,6 +14,7 @@ import string
 import random
 from .forms import DocumentForm
 from .models import Document
+from django.core.mail import send_mail
 
 # Create your views here.
 
@@ -24,15 +25,26 @@ def upload_content(request):
         folder = id_generator()
         zip_file = request.FILES['Plik_zip']
         excel_file = request.FILES['Plik_konfiguracyjny']
+        email = request.POST['Email']
+        print (email)
         if form.is_valid():
             form.save()
             unzipping_file(zip_file, folder)
             shutil.move(os.path.join(settings.MEDIA_ROOT, 'documents/'+str(excel_file)),os.path.join(settings.MEDIA_ROOT, 'documents/'+str(folder)+'/'+str(excel_file)))
             os.remove(os.path.join(settings.MEDIA_ROOT, 'documents/'+str(zip_file)))
+            SendEmail('http://127.0.0.1:8000/media/documents/'+folder+'/index.html',email)
             return HttpResponseRedirect('')
     else:
         form = DocumentForm()
     return render(request, 'new.html', {'form':form})
+
+
+def SendEmail(link, email):
+    subject='Cześć'
+    massage='Tu jest twój link: ' + link
+    from_email = settings.EMAIL_HOST_USER
+    to_list = [email]
+    send_mail(subject,massage,from_email,to_list,fail_silently=True)
 
 
 def new(request):
