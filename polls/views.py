@@ -51,6 +51,7 @@ def new(request):
     return render(request, 'new.html')
 
 def unzipping_file(name, folder_name):
+    os.mkdir(os.path.join(settings.MEDIA_ROOT+'/documents/',folder_name))
     with zipfile.ZipFile(name, "r") as z:
         z.extractall("media/documents/"+str(folder_name))
 
