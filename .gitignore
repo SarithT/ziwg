@@ -90,6 +90,7 @@ ENV/
 
 .DS_Store
 
+!static
 staticfiles
 media
 *.sqlite3
