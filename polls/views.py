@@ -9,7 +9,11 @@ from django.utils.encoding import smart_str
 from wsgiref.util import FileWrapper
 import mimetypes
 from django.conf import settings
-import os
+import os, shutil
+import string
+import random
+from .forms import DocumentForm
+from .models import Document
 
 # Create your views here.
 
@@ -17,11 +21,14 @@ import os
 def upload_content(request):
     if request.method == 'POST':
         form = DocumentForm(request.POST, request.FILES)
-        file = request.FILES['Plik_zip']
+        folder = id_generator()
+        zip_file = request.FILES['Plik_zip']
+        excel_file = request.FILES['Plik_konfiguracyjny']
         if form.is_valid():
-            unzipping_file(file)
             form.save()
-            os.remove(os.path.join(settings.MEDIA_ROOT, 'documents/'+str(file)))
+            unzipping_file(zip_file, folder)
+            shutil.move(os.path.join(settings.MEDIA_ROOT, 'documents/'+str(excel_file)),os.path.join(settings.MEDIA_ROOT, 'documents/'+str(folder)+'/'+str(excel_file)))
+            os.remove(os.path.join(settings.MEDIA_ROOT, 'documents/'+str(zip_file)))
             return HttpResponseRedirect('')
     else:
         form = DocumentForm()
@@ -31,9 +38,9 @@ def upload_content(request):
 def new(request):
     return render(request, 'new.html')
 
-def unzipping_file(name):
+def unzipping_file(name, folder_name):
     with zipfile.ZipFile(name, "r") as z:
-        z.extractall("media/documents")
+        z.extractall("media/documents/"+str(folder_name))
 
 def index(request):
     return render(request, 'index.html')
@@ -41,6 +48,8 @@ def index(request):
 def all(request):
     return render(request, 'all.html')
 
+def id_generator(size=10, chars=string.ascii_lowercase + string.ascii_uppercase + string.digits):
+    return ''.join(random.choice(chars) for _ in range(size))
 
 
 
