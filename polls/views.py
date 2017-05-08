@@ -1,10 +1,6 @@
 from django.shortcuts import render
-from django.http import HttpResponse
 from django.http import HttpResponseRedirect
-from .forms import DocumentForm
-from django.http import JsonResponse
 import zipfile
-import json
 from django.utils.encoding import smart_str
 from wsgiref.util import FileWrapper
 import mimetypes
@@ -13,20 +9,25 @@ import os, shutil
 import string
 import random
 from .forms import DocumentForm
-from .models import Document
 from django.core.mail import send_mail
+from .scripts import CitationsMaker
+from .scripts import LexemMaker
+from .scripts import Parser
+from .scripts import TestCorpusParser
+
 
 # Create your views here.
 
-
+#zapisanie danych na serwerze + działanie
 def upload_content(request):
     if request.method == 'POST':
         form = DocumentForm(request.POST, request.FILES)
         folder = id_generator()
+        path_to_folder = os.path.join(settings.MEDIA_ROOT, 'documents/'+folder+'/')
+
         zip_file = request.FILES['Plik_zip']
         excel_file = request.FILES['Plik_konfiguracyjny']
         email = request.POST['Email']
-        print (email)
         if form.is_valid():
             form.save()
             unzipping_file(zip_file, folder)
@@ -39,6 +40,18 @@ def upload_content(request):
     return render(request, 'new.html', {'form':form})
 
 
+
+#generuje nazwe folderu
+def id_generator(size=10, chars=string.ascii_lowercase + string.ascii_uppercase + string.digits):
+    return ''.join(random.choice(chars) for _ in range(size))
+
+#odpakowanie plików
+def unzipping_file(name, folder_name):
+    os.mkdir(os.path.join(settings.MEDIA_ROOT+'/documents/',folder_name))
+    with zipfile.ZipFile(name, "r") as z:
+        z.extractall("media/documents/"+str(folder_name))
+
+#Wysyłanie maila
 def SendEmail(link, email):
     subject='Cześć'
     massage='Tu jest twój link: ' + link
@@ -47,26 +60,14 @@ def SendEmail(link, email):
     send_mail(subject,massage,from_email,to_list,fail_silently=True)
 
 
-def new(request):
-    return render(request, 'new.html')
-
-def unzipping_file(name, folder_name):
-    os.mkdir(os.path.join(settings.MEDIA_ROOT+'/documents/',folder_name))
-    with zipfile.ZipFile(name, "r") as z:
-        z.extractall("media/documents/"+str(folder_name))
-
 def index(request):
     return render(request, 'index.html')
 
 def all(request):
     return render(request, 'all.html')
 
-def id_generator(size=10, chars=string.ascii_lowercase + string.ascii_uppercase + string.digits):
-    return ''.join(random.choice(chars) for _ in range(size))
-
-
-
-
+def new(request):
+    return render(request, 'new.html')
 # def download(request):
 #     path_to_file = os.path.join(settings.MEDIA_ROOT, 'template.xlsx')
 #     file = open(path_to_file,'rb')

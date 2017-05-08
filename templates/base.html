@@ -85,9 +85,22 @@
 </footer>
 
 
-<script type="text/javascript" src="lib/jquery-1.11.0.min.js"></script>
-<script type="text/javascript" src="lib/bootstrap.min.js"></script>
-<script type="text/javascript" src="js/rowlink.js"></script>
+<script type="text/javascript" src="../static/lib/jquery-1.11.0.min.js"></script>
+<script type="text/javascript" src="../static/lib/bootstrap.min.js"></script>
+<script type="text/javascript" src="../static/js/rowlink.js"></script>
+<script>
+    $("#howitworksButton").click(function() {
+        $('html, body').animate({
+            scrollTop: $("#howitworks").offset().top
+        }, 1000);
+    });
+
+    $("#aboutUsButton").click(function() {
+        $('html, body').animate({
+            scrollTop: $("#aboutUs").offset().top
+        }, 1000);
+    });
+</script>
 
 </body>
 </html>
