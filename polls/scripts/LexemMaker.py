@@ -77,10 +77,10 @@ def tool(lpmn, user):
         return data["value"]
 
 
-def main():
+def main(path):
 
-    in_path = "in/"
-    out_path = 'out/'
+    in_path = path+"in/"
+    out_path = path+'out/'
     global_time = time.time()
 
     for file in os.listdir(in_path + "."):

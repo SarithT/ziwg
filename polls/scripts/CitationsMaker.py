@@ -4,14 +4,14 @@ import codecs
 # robi plik .tsv z wejściowego .xls (testowo .xls, bo taki plik moglam stworzyć w TestCorpusParser, potem moze być .xlsx)
 
 
-def make(path):
+def make(path,excel_name):
     current_row = 0
     current_col = 0
 
     # path to the file you want to extract data from
     out_path = path+'outcsv/'
 
-    src = 'citations.xls'
+    src = path+str(excel_name)
 
     book = xlrd.open_workbook(src)
 
@@ -22,7 +22,7 @@ def make(path):
     num_rows = work_sheet.nrows
     num_cols = work_sheet.ncols
 
-    f = codecs.open(out_path + "citations.tsv", 'w', "utf-8")
+    f = codecs.open(out_path + "citations.tsv", 'w+', "utf-8")
 
     row = ""
 

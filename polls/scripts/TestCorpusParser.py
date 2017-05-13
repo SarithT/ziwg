@@ -10,10 +10,10 @@ import datetime
 # i odczytuje dane, zeby stworzyć automatycznie plik citations
 
 
-def parser(path):
+def parser(path,excel_name):
 
-    excel_path_empty = "citations_empty.xlsx"
-    excel_path = "citations.xls"
+    excel_path_empty = path+"citations_empty.xlsx"
+    excel_path = path + str(excel_name)
     current_row = 1
     column_id = 0
     column_title = 2
@@ -21,7 +21,7 @@ def parser(path):
     column_journal = 4
     column_date = 7
 
-    in_path = "corpus/"
+    in_path = path+"corpus/"
     out_path = path+'in/'
 
     citations_empty = open_workbook(excel_path_empty)

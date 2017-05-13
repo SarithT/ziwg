@@ -26,13 +26,22 @@ def upload_content(request):
         path_to_folder = os.path.join(settings.MEDIA_ROOT, 'documents/'+folder+'/')
 
         zip_file = request.FILES['Plik_zip']
-        excel_file = request.FILES['Plik_konfiguracyjny']
+        excel_name = request.FILES['Plik_konfiguracyjny']
         email = request.POST['Email']
         if form.is_valid():
             form.save()
+
             unzipping_file(zip_file, folder)
-            shutil.move(os.path.join(settings.MEDIA_ROOT, 'documents/'+str(excel_file)),os.path.join(settings.MEDIA_ROOT, 'documents/'+str(folder)+'/'+str(excel_file)))
+            os.mkdir(os.path.join(settings.MEDIA_ROOT + '/documents/' + str(folder) + '/' + 'outcsv'))
+            os.mkdir(os.path.join(settings.MEDIA_ROOT + '/documents/' + str(folder) + '/' + 'out'))
+            shutil.move(os.path.join(settings.MEDIA_ROOT, 'documents/'+str(excel_name)),os.path.join(settings.MEDIA_ROOT, 'documents/'+str(folder)+'/'+str(excel_name)))
             os.remove(os.path.join(settings.MEDIA_ROOT, 'documents/'+str(zip_file)))
+
+            CitationsMaker.make(path_to_folder,excel_name)
+            LexemMaker.main(path_to_folder)
+            Parser.parser(path_to_folder)
+
+
             SendEmail('http://127.0.0.1:8000/media/documents/'+folder+'/index.html',email)
             return HttpResponseRedirect('')
     else:
