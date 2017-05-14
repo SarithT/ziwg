@@ -1,0 +1,397 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TMS</title>
+
+  <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}" media="screen">
+  <link rel="stylesheet" href="{% static 'css/index.css' %}" type="text/css">
+  <script type="text/javascript" src="{% static 'js/d3.min.js' %}"></script>
+</head>
+
+<body>
+<div class="navbar navbar-inverse navbar-default">
+  <div class="container">
+
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="#">TMS</a>
+    </div>
+
+    <div id="nav_toplevel" class="collapse navbar-collapse">
+      <ul id="nav_main" class="nav navbar-nav">
+        <li><a href="#/model">Przegląd tematów</a></li>
+        <li id="nav_topic" class="dropdown">
+          <a href="#/topic" class="dropdown-toggle" data-toggle="dropdown" data-target="#" id="topic_dropdown_toggle">
+            Tematy<b class="caret"></b>
+          </a>
+          <ul id="topic_dropdown" class="dropdown-menu scroll-menu" role="menu" aria-labelledby="topic_dropdown_toggle">
+            <li class="disabled loading_message"><a href="#/topic">Wczytywanie...</a></li>
+          </ul>
+        </li>
+        <li id="nav_doc"><a href="#/doc">Dokument</a></li>
+        <li id="nav_word"><a href="#/word">Szukaj słowa</a></li>
+        <li id="nav_bib"><a href="#/bib">Bibliografia</a></li>
+        <li id="nav_words"><a href="#/words">Wykaz słów</a></li>
+        <li><a><img id="working_icon" alt="Working..."
+          class="img-responsive"
+          src="{% static 'img/loading.gif' %}" /></a></li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li id="nav_settings"><a href="#/settings">Ustawienia</a></li>
+        <li id="nav_about"><a href="/polls/all">Powrót do bazy korpusów <span class="glyphicon glyphicon-chevron-right"></span></a></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="settings_modal" tabindex="-1"
+    role="dialog" aria-labelledby="settings_title" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+        <h4 class="modal-title" id="settings_title">Ustawienia</h4>
+      </div>
+      <div class="modal-body">
+        <p class="help">Użyj elementów sterujących, aby dostosować ilość informacji wyświetlanych na stronach.</p>
+        <form role="form">
+          <div id="reveal_hidden">
+            <input type="checkbox">
+            <label>Pokaż ukryte tematy</label>
+          </div>
+          <div id="n_words_list">
+            <input type="number">
+            <label>Ilość słów w listach</label>
+          </div>
+          <div id="n_words_topic">
+            <input type="number">
+            <label>Ilość słów na stronach tematów</label>
+          </div>
+          <div id="n_topic_docs">
+            <input type="number">
+            <label>Ilość artykułów na stronach tematów</label>
+          </div>
+          <div id="conditional_streamgraph">
+            <input type="checkbox">
+            <label>Wyświetl przegląd tematów na wykresie strumienia</label>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default pull-right"
+            data-dismiss="modal">
+          Zamknij
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="main_container" class="container">
+
+  <div id="error" class="alert alert-danger alert-dismissable hidden">
+    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+  </div>
+
+  <div id="warning" class="alert alert-warning alert-dismissable hidden">
+    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+  </div>
+
+  <div id="model_view" class="hidden">
+    <nav class="nav navbar-default hidden" role="navigation">
+      <div class="collapse navbar-collapse navbar-ex1-collapse">
+        <ul id="nav_model" class="nav navbar-nav nav-pills">
+          <li id="nav_model_grid" class="active">
+            <a href="#/model/grid">Ogólny</a>
+          </li>
+          <li id="nav_model_scaled">
+            <a href="#/model/scaled">Skalowanie</a>
+          </li>
+          <li id="nav_model_list">
+            <a href="#/model/list">Lista</a>
+          </li>
+          <li id="nav_model_conditional">
+            <a href="#/model/conditional">Strumień</a>
+          </li>
+        </ul>
+        <div class="navbar-right">
+          <p class="navbar-text help model_view_grid hidden">
+            naciśnij okrąg aby usyskać więcej szczegółów
+          </p>
+          <p id="model_view_help"
+          class="navbar-text help model_view_scaled model_view_conditional hidden">
+          scroll żeby przybliżyć/oddalić; naciśnij aby usyskać więcej szczegółów</p>
+          <p id="list_view_help"
+          class="navbar-text help model_view_list hidden">
+            naciśnij na nazwę kolumnu żeby posortować; naciśnij aby usyskać więcej szczegółów</p>
+          <p id="conditional_view_help" class="navbar-text help model_view_conditional">
+            oś Y:
+          </p>
+          <ul id="conditional_choice"
+            class="nav navbar-nav nav-pills model_view_conditional hidden">
+            <li id="nav_model_conditional_frac" class="active">
+              <a href="#/model/conditional/frac">
+                <span class="not-proper hidden">%</span>
+                <span class="proper hidden">conditional</span>
+              </a>
+            </li>
+            <li id="nav_model_conditional_raw">
+              <a href="#/model/conditional/raw">
+                <span class="not-proper hidden">Licza słów</span>
+                <span class="proper hidden">joint</span>
+              </a>
+            </li>
+          </ul>
+          <button id="reset_zoom" type="button"
+            class="btn btn-default navbar-btn
+              model_view_scaled model_view_conditional hidden">
+            Reset
+          </button>
+        </div>
+      </div>
+    </nav>
+    <div id="model_view_list" class="hidden">
+      <table class="table table-condensed">
+        <thead>
+          <tr>
+            <th id="model_view_list_topic" class="sort">
+              <a href="#/model/list/topic" title="Naciśnij, żeby posortować">
+                Temat
+              </a><span class="glyphicon glyphicon-sort"></span>
+            </th>
+            <th id="model_view_list_condition" class="sort">
+              <a href="#/model/list/condition"
+                  title="Naciśnij, żeby posortować">
+                czas
+              </a><span class="glyphicon glyphicon-sort"></span>
+            </th>
+            <th id="model_view_list_words" class="sort">
+              <a href="#/model/list/words" title="Naciśnij, żeby posortować">
+                Najczęstsze słowa
+              </a><span class="glyphicon glyphicon-sort"></span>
+            </th>
+            <th colspan="2" id="model_view_list_frac" class="sort text-right">
+              <a href="#/model/list/frac" title="Naciśnij, żeby posortować">
+                <span class="not-proper hidden">Część korpusu</span>
+                <span class="proper hidden">Średnie prawdopodobieństwo</span>
+              </a><span class="glyphicon glyphicon-sort"></span>
+            </th>
+          </tr>
+        </thead>
+        <tbody class="calc-done">
+        </tbody>
+      </table>
+    </div>
+    <div id="model_view_plot" class="hidden">
+    </div>
+    <div id="model_view_conditional" class="hidden">
+    </div>
+  </div>
+
+  <div id="topic_view" class="hidden">
+    <div id="topic_view_help" class="hidden">
+      <p class="help">Wybierz temat z menu "Tematy"</p>
+    </div>
+    <div id="topic_view_main">
+      <div class="row">
+        <div id="topic_view_header" class="col-md-8">
+          <h2 id="topic_header"></h2>
+          <h3 id="topic_subheader" class="hidden">
+            <span class="topic_subtitle"></span>
+          </h3>
+        </div>
+        <div id="topic_view_annotation" class="col-md-4">
+          <!-- insert class="view_topic_nn" specific notes here -->
+        </div>
+      </div>
+      <div class="row">
+        <div id="topic_words" class="col-md-3">
+          <h3 class="h-small"></h3>
+          <table class="table table-condensed" id="topic_words">
+            <thead>
+              <tr>
+                <th>Słowo</th>
+                <th class="th-right">Występowanie</th>
+              </tr>
+            </thead>
+            <tbody>
+            </tbody>
+          </table>
+        </div>
+        <div class="col-md-9">
+          <div id="topic_conditional">
+            <h3 class="h-small">Występowanie
+              <span class="not-proper hidden">słów w temacie</span>
+              <span class="proper hidden">tematów</span>
+            </h3>
+            <p class="pull-left help">
+              Naciśnij, żeby wyświetlić dokumenty z danego okresu
+            </p>
+            <div class="pull-right">
+              <button class="btn btn-default disabled" type="button"
+                id="topic_condition_clear">Wyczyść wybór</button>
+            </div>
+            <div id="topic_plot">
+            </div>
+          </div>
+          <div id="topic_docs">
+            <h3 id="topic_docs_header" class="h-small">Dokumenty<span class="topic_condition"></span></h3>
+            <p class="help none">Nie znaleziono dokumentów zawierających ten temat<span class="topic_condition"></span>.</p>
+            <table class="table table-condensed hidden calc-done">
+              <thead>
+                <tr>
+                  <th id="topic_docs_doc">Dokument</th>
+                  <th id="topic_docs_weight"></th>
+                  <th id="topic_docs_frac" class="th-right">%</th>
+                  <th id="topic_docs_tokens"
+                    class="th-right not-proper hidden">Tokeny</th>
+                </tr>
+              </thead>
+              <tbody>
+              </tbody>
+            </table>
+          </div> <!-- #topic_docs -->
+        </div>
+      </div>
+    </div> <!-- #topic_view_main -->
+  </div>
+
+  <div id="doc_view" class="hidden">
+    <div id="doc_view_help">
+      <p class="help">Wybierz dokument z
+      <a class="external" href="#/bib">menu "Bibliografia"</a> lub
+        <a class="external" href="#/topic">ze strony tematów</a>.</p>
+      <p class="help hidden" id="last_doc_help">Poniżej ostatni wybrany dokument. Link do dokumentu: <a class="external" id="last_doc" href="#/doc"></a></p>
+    </div>
+    <div id="doc_view_main" class="calc-done">
+      <h2 class="h-small" id="doc_header"></h2>
+      <p id="doc_remark">
+      <span class="not-proper hidden">
+        <span class="token_count">...</span>
+        tokeny/ów
+      </span>
+        (<a class="url external">zobacz na JSTOR</a>)
+      </p>
+      <table class="table table-condensed" id="doc_topics">
+        <thead>
+          <tr>
+            <th id="doc_view_topic">Tematy</th>
+            <th id="doc_view_words">Najczęstsze słowa</th>
+            <th id="doc_view_weight"></th>
+            <th id="doc_view_frac" class="th-right">%</th>
+            <th id="doc_view_tokens" class="th-right not-proper hidden">Tokeny</th>
+          </tr>
+        </thead>
+        <tbody>
+        </tbody>
+      </table>
+    </div><!-- #doc_view_main -->
+  </div>
+
+  <div id="word_view" class="hidden">
+    <div class="row">
+      <div class="col-md-8">
+        <div id="word_view_help">
+          <p class="help">Wybierz słowo z
+          <a class="external" href="#/words">list wszystkich słów</a> lub z
+            <a class="external" href="#/topic">strony tematów</a>.</p>
+          <p class="help hidden" id="last_word_help">Poniżej ostatnio wybrane słowa. Link do widoku: <a class="external" id="last_word" href="#/word"></a></p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <form id="word_view_form" class="form-inline pull-right" role="form">
+          <div class="form-group">
+            <label class="sr-only" for="word_input">Wybierz słowo:</label>
+            <input type="text" class="form-control" id="word_input" placeholder="Wpisz słowo">
+          </div>
+          <button type="submit" class="btn btn-default">Lista tematów</button>
+        </form>
+      </div>
+    </div>
+    <div id="word_view_main" class="row">
+      <div class="col-md-12">
+        <h2 id="word_header">Tematy dla <span class="word"></span></h2>
+        <div id="word_view_explainer">
+          <p class="help"></p>
+        </div>
+        <div class="alert alert-info none hidden">
+          <p>Nie znaleziono tematów zawierających słowo.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="bib_view" class="hidden">
+    <nav id="bib_nav" class="nav navbar-default" role="navigation">
+      <div class="container">
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+          <p class="navbar-text">Sortowanie:</p>
+          <form id="bib_sort_form" class="navbar-form navbar-left">
+            <div class="form-group">
+              <select class="form-control" id="select_bib_sort">
+              </select>
+            </div>
+            <div class="form-group">
+              <select class="form-control" id="select_bib_dir">
+                <option id="sort_bib_up" value="up">
+                  Rosnąco
+                </option>
+                <option id="sort_bib_down" value="down">
+                  Malejąco
+                </option>
+              </select>
+            </div>
+          </form>
+        </div>
+      </div>
+    </nav>
+    <div class="row">
+      <div class="col-md-3">
+        <div id="bib_headings" data-spy="affix">
+          <p class="help">Przejdź do:</p>
+          <ul class="list-inline">
+          </ul>
+          <p><a class="top_link" href="#">Najnowsze</a></p>
+        </div>
+      </div>
+      <div class="col-md-9">
+        <div id="bib_main"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="words_view" class="hidden">
+    <h2>Wszystkie słowa</h2>
+    <p class="help">Słowa nie wyróżniające się w żadnym z tematów nie są wymienione</p>
+    <ul id="vocab_list" class="list-unstyled"></ul>
+  </div>
+
+</div> <!-- /container -->
+
+<script type="text/javascript" src="{% static 'js/jquery.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/bootstrap.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/jszip.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/worker.min.js' %}"></script>
+
+<!-- __DATA__ -->
+
+<script type="text/javascript" src="{% static 'js/utils.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/dfb.min.js' %}"></script>
+
+<script type="text/javascript">
+dfb().load();
+</script>
+
+</body>
+
+</html>
+
