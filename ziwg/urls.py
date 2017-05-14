@@ -26,6 +26,7 @@ urlpatterns = [
     url(r'^$', index),
     url(r'^admin/', admin.site.urls),
     url(r'^polls/', include('polls.urls')),
+    url(r'^presentation/', include('presentation.urls')),
 ]
 
 if settings.DEBUG:

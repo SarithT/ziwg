@@ -14,6 +14,8 @@ from .scripts import CitationsMaker
 from .scripts import LexemMaker
 from .scripts import Parser
 from .scripts import TestCorpusParser
+os.environ['R_USER'] = 'C:/Users/tanda'
+import rpy2.robjects as ro
 
 
 # Create your views here.
@@ -40,7 +42,7 @@ def upload_content(request):
             CitationsMaker.make(path_to_folder,excel_name)
             LexemMaker.main(path_to_folder)
             Parser.parser(path_to_folder)
-
+            rcall(path_to_folder,50,1,1)
 
             SendEmail('http://127.0.0.1:8000/media/documents/'+folder+'/index.html',email)
             return HttpResponseRedirect('')
@@ -48,6 +50,33 @@ def upload_content(request):
         form = DocumentForm()
     return render(request, 'new.html', {'form':form})
 
+
+def rcall(path=os.getcwd(), n=40, model=1, browser=1):
+    rstring = """
+
+	function(path, n, model, browser){
+		setwd(path)
+		options(java.parameters="-Xmx2g")
+		library("rJava")
+		library("mallet")
+		library("dfrtopics")
+		m <- model_dfr_documents(
+			"outcsv/citations.tsv",
+			"outcsv/wordcounts",
+			n
+		)
+		if (model != 0) {
+			# save model outputs
+			write_mallet_model(m, output_dir="model")
+		}
+		if (browser != 0) {
+			# create and save browser files
+			export_browser_data(m, out_dir="browser", supporting_files=TRUE)
+		}
+	}
+	"""
+    rr = ro.r(rstring)
+    rr(path, n, model, browser)
 
 
 #generuje nazwe folderu
