@@ -1,20 +1,28 @@
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
-import zipfile
-from django.utils.encoding import smart_str
-from wsgiref.util import FileWrapper
-import mimetypes
-from django.conf import settings
-import os, shutil
-import string
-import random
-from .forms import DocumentForm
+from django.http import HttpResponse
 from django.core.mail import send_mail
+from django.utils.encoding import smart_str
+from django.template import loader
+from django.conf import settings
+from django.db import models
+
+from wsgiref.util import FileWrapper
+
+from .forms import DocumentForm
+
 from .scripts import CitationsMaker
 from .scripts import LexemMaker
 from .scripts import Parser
 from .scripts import TestCorpusParser
 
+from .models import Document
+
+import zipfile
+import mimetypes
+import os, shutil
+import string
+import random
 
 # Create your views here.
 
@@ -41,14 +49,11 @@ def upload_content(request):
             LexemMaker.main(path_to_folder)
             Parser.parser(path_to_folder)
 
-
             SendEmail('http://127.0.0.1:8000/media/documents/'+folder+'/index.html',email)
             return HttpResponseRedirect('')
     else:
         form = DocumentForm()
     return render(request, 'new.html', {'form':form})
-
-
 
 #generuje nazwe folderu
 def id_generator(size=10, chars=string.ascii_lowercase + string.ascii_uppercase + string.digits):
@@ -70,10 +75,20 @@ def SendEmail(link, email):
 
 
 def index(request):
-    return render(request, 'index.html')
+    last_ten = Document.objects.all().order_by('-id')[:10]
+    indexTemplate = loader.get_template('index.html')
+    context = {
+        'last_ten': last_ten,
+    }
+    return HttpResponse(indexTemplate.render(context, request))
 
 def all(request):
-    return render(request, 'all.html')
+    allCorpuses = Document.objects.all().order_by('-id')
+    allTemplate = loader.get_template('all.html')
+    context = {
+        'allCorpuses' : allCorpuses,
+    }
+    return HttpResponse(allTemplate.render(context, request))
 
 def new(request):
     return render(request, 'new.html')
