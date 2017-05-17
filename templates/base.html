@@ -1,4 +1,4 @@
-{% load static %}
+ {% load static %}
 
 
 {#<!DOCTYPE html>#}
@@ -90,15 +90,26 @@
 <script type="text/javascript" src="{% static 'js/rowlink.js' %}"></script>
 <script>
     $("#howitworksButton").click(function() {
-        $('html, body').animate({
-            scrollTop: $("#howitworks").offset().top
-        }, 1000);
+        var path = window.location.pathname;
+        if(path != "/polls/"){
+            location.href = '/polls#howitworks';
+        }else {
+            $('html, body').animate({
+                scrollTop: $("#howitworks").offset().top
+            }, 1000);
+        }
+
     });
 
     $("#aboutUsButton").click(function() {
-        $('html, body').animate({
-            scrollTop: $("#aboutUs").offset().top
-        }, 1000);
+        var path = window.location.pathname;
+        if(path != "/polls/"){
+            location.href = '/polls#aboutUs';
+        }else {
+            $('html, body').animate({
+                scrollTop: $("#aboutUs").offset().top
+            }, 1000);
+        }
     });
 </script>
 

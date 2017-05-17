@@ -70,7 +70,7 @@ def parser(path):
         if not os.path.exists(out_path + "wordcounts/"):
             os.makedirs(out_path + "wordcounts/")
         try:
-            with open(out_path + "wordcounts\wordcounts_" + fileName + '.csv', 'w', newline="\n", encoding="ansi") as csv_file:
+            with open(out_path + "wordcounts/wordcounts_" + fileName + '.csv', 'w', newline='\n', encoding='utf-8') as csv_file:
                 writer = csv.writer(csv_file)
                 writer.writerow(["WORDCOUNTS", "WEIGHT"])
                 for key, value in dict.items():

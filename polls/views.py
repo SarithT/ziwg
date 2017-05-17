@@ -1,22 +1,30 @@
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
-import zipfile
-from django.utils.encoding import smart_str
-from wsgiref.util import FileWrapper
-import mimetypes
-from django.conf import settings
-import os, shutil
-import string
-import random
-from .forms import DocumentForm
+from django.http import HttpResponse
 from django.core.mail import send_mail
+from django.utils.encoding import smart_str
+from django.template import loader
+from django.conf import settings
+from django.db import models
+
+from wsgiref.util import FileWrapper
+
+from .forms import DocumentForm
+
 from .scripts import CitationsMaker
 from .scripts import LexemMaker
 from .scripts import Parser
 from .scripts import TestCorpusParser
-os.environ['R_USER'] = 'C:/Users/tanda'
+# os.environ['R_USER'] = 'C:/Users/tanda'
 import rpy2.robjects as ro
 
+from .models import Document
+
+import zipfile
+import mimetypes
+import os, shutil
+import string
+import random
 
 # Create your views here.
 
@@ -42,13 +50,16 @@ def upload_content(request):
             CitationsMaker.make(path_to_folder,excel_name)
             LexemMaker.main(path_to_folder)
             Parser.parser(path_to_folder)
+
             rcall(path_to_folder,50,1,1)
 
-            SendEmail('http://127.0.0.1:8000/media/documents/'+folder+'/index.html',email)
+
+            SendEmail('http://localhost:8000/media/documents/'+folder+'/browser/index.html',email)
             return HttpResponseRedirect('')
     else:
         form = DocumentForm()
     return render(request, 'new.html', {'form':form})
+
 
 
 def rcall(path=os.getcwd(), n=40, model=1, browser=1):
@@ -91,6 +102,7 @@ def unzipping_file(name, folder_name):
 
 #Wysyłanie maila
 def SendEmail(link, email):
+    print(link)
     subject='Cześć'
     massage='Tu jest twój link: ' + link
     from_email = settings.EMAIL_HOST_USER
@@ -99,10 +111,20 @@ def SendEmail(link, email):
 
 
 def index(request):
-    return render(request, 'index.html')
+    last_ten = Document.objects.all().order_by('-id')[:10]
+    indexTemplate = loader.get_template('index.html')
+    context = {
+        'last_ten': last_ten,
+    }
+    return HttpResponse(indexTemplate.render(context, request))
 
 def all(request):
-    return render(request, 'all.html')
+    allCorpuses = Document.objects.all().order_by('-id')
+    allTemplate = loader.get_template('all.html')
+    context = {
+        'allCorpuses' : allCorpuses,
+    }
+    return HttpResponse(allTemplate.render(context, request))
 
 def new(request):
     return render(request, 'new.html')
