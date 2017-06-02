@@ -33,11 +33,13 @@ def upload_content(request):
     if request.method == 'POST':
         form = DocumentForm(request.POST, request.FILES)
         folder = id_generator()
+        os.mkdir(os.path.join(settings.MEDIA_ROOT + '/documents/'+str(folder)))
         path_to_folder = os.path.join(settings.MEDIA_ROOT, 'documents/'+folder+'/')
 
         zip_file = request.FILES['Plik_zip']
         excel_name = request.FILES['Plik_konfiguracyjny']
         email = request.POST['Email']
+        numberOfTopics = request.POST['Ilość_tematów']
         if form.is_valid():
             form.save()
 
@@ -51,11 +53,11 @@ def upload_content(request):
             LexemMaker.main(path_to_folder)
             Parser.parser(path_to_folder)
 
-            rcall(path_to_folder,50,1,1)
+            rcall(path_to_folder,numberOfTopics,1,1)
 
 
             SendEmail('http://localhost:8000/media/documents/'+folder+'/browser/index.html',email)
-            return HttpResponseRedirect('')
+            return HttpResponseRedirect('/')
     else:
         form = DocumentForm()
     return render(request, 'new.html', {'form':form})
@@ -96,9 +98,8 @@ def id_generator(size=10, chars=string.ascii_lowercase + string.ascii_uppercase 
 
 #odpakowanie plików
 def unzipping_file(name, folder_name):
-    os.mkdir(os.path.join(settings.MEDIA_ROOT+'/documents/',folder_name))
     with zipfile.ZipFile(name, "r") as z:
-        z.extractall("media/documents/"+str(folder_name))
+        z.extractall(os.path.join(settings.MEDIA_ROOT + '/documents/' + str(folder_name)))
 
 #Wysyłanie maila
 def SendEmail(link, email):
@@ -128,6 +129,8 @@ def all(request):
 
 def new(request):
     return render(request, 'new.html')
+
+
 # def download(request):
 #     path_to_file = os.path.join(settings.MEDIA_ROOT, 'template.xlsx')
 #     file = open(path_to_file,'rb')
