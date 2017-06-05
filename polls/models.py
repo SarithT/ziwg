@@ -15,4 +15,3 @@ class Document(models.Model):
     uploaded_at = models.DateTimeField(auto_now_add=True)
     active = models.BooleanField(default=False)
     public = models.BooleanField(default=False)
-

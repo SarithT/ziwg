@@ -2,7 +2,6 @@ from django.shortcuts import render
 from django.http import HttpResponseRedirect
 from django.http import HttpResponse
 from django.core.mail import send_mail
-from django.utils.encoding import smart_str
 from django.template import loader
 from django.conf import settings
 from django.db import models
@@ -14,14 +13,10 @@ from .forms import DocumentForm
 from .scripts import CitationsMaker
 from .scripts import LexemMaker
 from .scripts import Parser
-from .scripts import TestCorpusParser
-# os.environ['R_USER'] = 'C:/Users/tanda'
 import rpy2.robjects as ro
 
 from .models import Document
-
 import zipfile
-import mimetypes
 import os, shutil
 import string
 import random
@@ -32,20 +27,22 @@ import random
 def upload_content(request):
     if request.method == 'POST':
         form = DocumentForm(request.POST, request.FILES)
-        folder = id_generator()
-        os.mkdir(os.path.join(settings.MEDIA_ROOT + '/documents/'+str(folder)))
-        path_to_folder = os.path.join(settings.MEDIA_ROOT, 'documents/'+folder+'/')
 
-        zip_file = request.FILES['Plik_zip']
-        excel_name = request.FILES['Plik_konfiguracyjny']
-        email = request.POST['Email']
-        numberOfTopics = request.POST['Ilość_tematów']
         if form.is_valid():
-            form.save()
+            folder = id_generator()
 
-            unzipping_file(zip_file, folder)
+            os.mkdir(os.path.join(settings.MEDIA_ROOT + '/documents/' + str(folder)))
             os.mkdir(os.path.join(settings.MEDIA_ROOT + '/documents/' + str(folder) + '/' + 'outcsv'))
             os.mkdir(os.path.join(settings.MEDIA_ROOT + '/documents/' + str(folder) + '/' + 'out'))
+            path_to_folder = os.path.join(settings.MEDIA_ROOT, 'documents/' + folder + '/')
+
+            zip_file = request.FILES['Plik_zip']
+            excel_name = request.FILES['Plik_konfiguracyjny']
+            email = request.POST['Email']
+            number_of_topics = request.POST['Ilość_tematów']
+            form.save()
+            unzipping_file(zip_file, folder)
+
             shutil.move(os.path.join(settings.MEDIA_ROOT, 'documents/'+str(excel_name)),os.path.join(settings.MEDIA_ROOT, 'documents/'+str(folder)+'/'+str(excel_name)))
             os.remove(os.path.join(settings.MEDIA_ROOT, 'documents/'+str(zip_file)))
 
@@ -53,7 +50,7 @@ def upload_content(request):
             LexemMaker.main(path_to_folder)
             Parser.parser(path_to_folder)
 
-            rcall(path_to_folder,numberOfTopics,1,1)
+            rcall(path_to_folder,number_of_topics,1,1)
 
 
             SendEmail('http://localhost:8000/media/documents/'+folder+'/browser/index.html',email)
@@ -61,7 +58,6 @@ def upload_content(request):
     else:
         form = DocumentForm()
     return render(request, 'new.html', {'form':form})
-
 
 
 def rcall(path=os.getcwd(), n=40, model=1, browser=1):
