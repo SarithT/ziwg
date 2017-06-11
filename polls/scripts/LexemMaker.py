@@ -56,12 +56,15 @@ def tool(lpmn, user):
         doc = doc.encode("utf-8")
         header = {'Content-Type': 'application/json'}
         req = urllib.request.Request(url+'/startTask/', doc, header)
+        type(req)
         taskid = urllib.request.urlopen(req).read().decode("utf-8")
 
         print(taskid)
 
         time.sleep(0.1)
+
         resp = urllib.request.urlopen(urllib.request.Request(url+'/getStatus/'+taskid))
+
         data = json.load(resp)
 
         print(data)
@@ -69,7 +72,10 @@ def tool(lpmn, user):
         while data["status"] == "QUEUE" or data["status"] == "PROCESSING":
             time.sleep(0.1)
             resp = urllib.request.urlopen(urllib.request.Request(url+'/getStatus/'+taskid))
+
+            print(resp)
             data = json.load(resp)
+
 
         if data["status"] == "ERROR":
             print("Error "+data["value"])

@@ -20,6 +20,10 @@ EMAIL_PORT = 587
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 import os
+import djcelery
+djcelery.setup_loader()
+
+BROKER_URL = "amqp://david:dawid1994@localhost:5672/localhost"
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -34,12 +38,12 @@ SECRET_KEY = '2#1zau&g^c3g8^yvl$zy6zsnq+sf*$58+*q060u_p(&t%ai%a)'
 # SECURITY WARNING: don't run with debug turned on in production!
 
 
-DEBUG = True
-ALLOWED_HOSTS = []
+# DEBUG = True
+# ALLOWED_HOSTS = []
 
 
-# DEBUG = False
-# ALLOWED_HOSTS = ["localhost"]
+DEBUG = False
+ALLOWED_HOSTS = ["localhost"]
 
 # Application definition
 
@@ -53,6 +57,7 @@ INSTALLED_APPS = [
     'bootstrap3',
     'polls',
     'presentation',
+    'djcelery'
 ]
 
 MIDDLEWARE = [
@@ -135,10 +140,10 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR,'static')
-]
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+# STATICFILES_DIRS = [
+#     os.path.join(BASE_DIR,'static')
+# ]
+STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

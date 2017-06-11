@@ -1,0 +1,33 @@
+upstream django {
+    server unix:///home/david/ziwg/ziwg/ziwg.sock; # for a file socket
+    # server 127.0.0.1:8001; # for a web port socket (we'll use this first)
+}
+
+# configuration of the server
+server {
+    # the port your site will be served on
+    listen      8000;
+    # the domain name it will serve for
+    server_name localhost; # substitute your machine's IP address or FQDN
+    charset     utf-8;
+
+    # max upload size
+    client_max_body_size 2000M;   # adjust to taste
+    location = /favicon.ico { access_log off; log_not_found off; }
+
+    # Django media
+    location /media  {
+        alias /home/david/ziwg/ziwg/media;  # your Django project's media files - amend as required
+    }
+
+    location /static {
+        alias /home/david/ziwg/ziwg/static; # your Django project's static files - amend as required
+    }
+
+    # Finally, send all non-media requests to the Django server.
+    location / {
+	proxy_set_header Host $host;
+        uwsgi_pass  django;
+        include     /home/david/ziwg/ziwg/uwsgi_params; # the uwsgi_params file you installed
+    }
+}
