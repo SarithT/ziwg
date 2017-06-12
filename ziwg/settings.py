@@ -23,7 +23,7 @@ import os
 import djcelery
 djcelery.setup_loader()
 
-BROKER_URL = "amqp://david:dawid1994@localhost:5672/localhost"
+BROKER_URL = "amqp://student:229lab229@localhost:5672/156.17.42.112"
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -43,7 +43,7 @@ SECRET_KEY = '2#1zau&g^c3g8^yvl$zy6zsnq+sf*$58+*q060u_p(&t%ai%a)'
 
 
 DEBUG = False
-ALLOWED_HOSTS = ["localhost"]
+ALLOWED_HOSTS = ["156.17.42.112"]
 
 # Application definition
 
