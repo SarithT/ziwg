@@ -92,9 +92,9 @@ ENV/
 
 !static
 staticfiles
-media
 *.sqlite3
 ziwg_uwsgi.ini
 ziwg.sock
 ziwg_nginx
 test.py
+uwsgi_params
