@@ -22,7 +22,7 @@ def run(path, n=40, model=1, browser=1, excel_name="", folder="", zip_file="", e
     Parser.parser(path)
     rcall(path, n, model, browser)
     removeUseless(folder)
-    SendEmail('http://localhost:8000/media/documents/' + folder + '/browser/index.html', email_name)
+    SendEmail('http://156.17.42.112:8000/presentation/' + str(folder) , email_name)
 
 
 def SendEmail(link, email):
@@ -42,27 +42,24 @@ def removeUseless(folder):
 
 def rcall(path=os.getcwd(), n=40, model=1, browser=1):
     rstring = """
+    	function(path, n, model, browser){
+    		setwd(path)
+    		options(java.parameters="-Xmx2g")
+    		library("rJava")
+    		library("mallet")
+    		library("dfrtopics")
+    		m <- model_dfr_documents(
+    			"outcsv/citations.tsv",
+    			"outcsv/wordcounts",
+    			n
+    		)
+    		if (model != 0) {
+    		    write_mallet_model(m, output_dir="model")
+    			# create and save browser files
+    			export_browser_data(m, out_dir="model", supporting_files=TRUE)
+    		}
+    	}
+    	"""
 
-	function(path, n, model, browser){
-		setwd(path)
-		options(java.parameters="-Xmx2g")
-		library("rJava")
-		library("mallet")
-		library("dfrtopics")
-		m <- model_dfr_documents(
-			"outcsv/citations.tsv",
-			"outcsv/wordcounts",
-			n
-		)
-		if (model != 0) {
-			# save model outputs
-			write_mallet_model(m, output_dir="model")
-		}
-		if (browser != 0) {
-			# create and save browser files
-			export_browser_data(m, out_dir="browser", supporting_files=TRUE)
-		}
-	}
-	"""
     rr = ro.r(rstring)
     rr(path, n, model, browser)

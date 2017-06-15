@@ -22,28 +22,25 @@ def upload_content(request):
         form = DocumentForm(request.POST, request.FILES)
 
         if form.is_valid():
-            folder = id_generator()
-
-            os.mkdir(os.path.join(settings.MEDIA_ROOT + '/documents/' + str(folder)))
-            os.mkdir(os.path.join(settings.MEDIA_ROOT + '/documents/' + str(folder) + '/' + 'outcsv'))
-            os.mkdir(os.path.join(settings.MEDIA_ROOT + '/documents/' + str(folder) + '/' + 'out'))
-            path_to_folder = os.path.join(settings.MEDIA_ROOT, 'documents/' + folder + '/')
-
             zip_file = request.FILES['Plik_zip']
             excel_name = request.FILES['Plik_konfiguracyjny']
             email = request.POST['Email']
             number_of_topics = request.POST['Ilość_tematów']
-            form.save()
+            saved_korpus = form.save()
+            folder = saved_korpus.id
+
+            os.mkdir(os.path.join(settings.MEDIA_ROOT + '/documents/' + str(folder)))
+            os.mkdir(os.path.join(settings.MEDIA_ROOT + '/documents/' + str(folder) + '/' + 'outcsv'))
+            os.mkdir(os.path.join(settings.MEDIA_ROOT + '/documents/' + str(folder) + '/' + 'out'))
+            path_to_folder = os.path.join(settings.MEDIA_ROOT, 'documents/' + str(folder) + '/')
+
+
             unzipping_file(zip_file, folder)
             run.delay(path_to_folder,number_of_topics,1,1,excel_name,folder,zip_file,email)
-            return HttpResponseRedirect('')
+            return render(request, 'thanks.html')
     else:
         form = DocumentForm()
     return render(request, 'new.html', {'form':form})
-
-
-
-
 
 #generuje nazwe folderu
 def id_generator(size=10, chars=string.ascii_lowercase + string.ascii_uppercase + string.digits):
