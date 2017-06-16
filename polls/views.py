@@ -53,7 +53,7 @@ def unzipping_file(name, folder_name):
 
 
 def index(request):
-    last_ten = Document.objects.filter(active = 1).order_by('-id')[:10]
+    last_ten = Document.objects.filter(active = 1, public = 1).order_by('-id')[:10]
     indexTemplate = loader.get_template('index.html')
     context = {
         'last_ten': last_ten,
@@ -61,7 +61,7 @@ def index(request):
     return HttpResponse(indexTemplate.render(context, request))
 
 def all(request):
-    allCorpuses = Document.objects.filter(active = 1).order_by('-id')
+    allCorpuses = Document.objects.filter(active = 1, public = 1).order_by('-id')
     allTemplate = loader.get_template('all.html')
     context = {
         'allCorpuses' : allCorpuses,

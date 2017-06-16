@@ -1,5 +1,5 @@
 {% load static %}
-
+{% load bootstrap3 %}
 <!DOCTYPE html>
 <html lang="pl">
 
@@ -52,6 +52,15 @@
     </div>
   </div>
 </div>
+
+{% if korpus.public == False %}
+<div class="container" style="margin-top: 10px">
+  <div class="well text-center">
+    <h4>Ten korpus nie jest jeszcze dostępny w bazie korpusów. Aby stał się publiczny naciśnij poniższy przycisk.</h4>
+      <a href='/presentation/setPublic/{{ korpus.id }}' id="setPublic" class="btn btn-default" type="button">Opublikuj</a>
+  </div>
+</div>
+{% endif %}
 
 <div class="modal fade" id="settings_modal" tabindex="-1"
     role="dialog" aria-labelledby="settings_title" aria-hidden="true">
