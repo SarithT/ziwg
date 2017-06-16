@@ -5,6 +5,7 @@ from django.conf import settings
 from .scripts import CitationsMaker
 from .scripts import LexemMaker
 from .scripts import Parser
+from .models import Document
 from django.core.mail import send_mail
 
 app = Celery('tasks')
@@ -22,6 +23,9 @@ def run(path, n=40, model=1, browser=1, excel_name="", folder="", zip_file="", e
     Parser.parser(path)
     rcall(path, n, model, browser)
     removeUseless(folder)
+    korpus = Document.objects.get(id = folder)
+    korpus.active = 1;
+    korpus.save()
     SendEmail('http://156.17.42.112:8000/presentation/' + str(folder) , email_name)
 
 
